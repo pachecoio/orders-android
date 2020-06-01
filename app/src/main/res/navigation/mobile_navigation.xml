@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/mobile_navigation"
+    app:startDestination="@+id/nav_order">
+
+    <fragment
+        android:id="@+id/nav_order"
+        android:name="io.pacheco.orders.ui.order.list.OrderListFragment"
+        android:label="Pedidos"
+        tools:layout="@layout/fragment_order_list">
+
+        <action
+            android:id="@+id/action_HomeFragment_to_HomeSecondFragment"
+            app:destination="@id/nav_home_second" />
+    </fragment>
+    <fragment
+        android:id="@+id/nav_home_second"
+        android:name="io.pacheco.orders.ui.home.HomeSecondFragment"
+        android:label="@string/home_second"
+        tools:layout="@layout/fragment_home_second">
+        <action
+            android:id="@+id/action_HomeSecondFragment_to_HomeFragment"
+            app:destination="@id/nav_order" />
+
+        <argument
+            android:name="myArg"
+            app:argType="string" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_product"
+        android:name="io.pacheco.orders.ui.product.list.ProductListFragment"
+        android:label="Produtos"
+        tools:layout="@layout/fragment_product_list" />
+
+    <fragment
+        android:id="@+id/nav_client"
+        android:name="io.pacheco.orders.ui.client.list.ClientListFragment"
+        android:label="Clientes"
+        tools:layout="@layout/fragment_client_list" />
+</navigation>
