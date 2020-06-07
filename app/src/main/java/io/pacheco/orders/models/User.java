@@ -18,6 +18,9 @@ public class User implements Parcelable {
     @SerializedName("role")
     private String role;
 
+    public User() {
+    }
+
     public User(Integer id, String name, String email, String role) {
         this.id = id;
         this.name = name;

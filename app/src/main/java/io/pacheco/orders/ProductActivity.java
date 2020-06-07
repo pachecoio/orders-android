@@ -23,7 +23,9 @@ import java.io.OutputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.pacheco.orders.api.ProductApi;
 import io.pacheco.orders.api.RetrofitClientInstance;
@@ -122,7 +124,10 @@ public class ProductActivity extends AppCompatActivity {
             Bundle extras = data.getExtras();
             Bitmap imageBitmap = (Bitmap) extras.get("data");
 
-            this.image = persistImage(imageBitmap, "product_image_" + String.valueOf(new Timestamp(System.currentTimeMillis())));
+            Date date = new Date();
+            long ms = date.getTime();
+
+            this.image = persistImage(imageBitmap, "product_image_" + String.valueOf(ms));
             productImage.setImageBitmap(imageBitmap);
         }
     }
@@ -152,12 +157,18 @@ public class ProductActivity extends AppCompatActivity {
 
         ProductApi service = RetrofitClientInstance.getRetrofitInstance().create(ProductApi.class);
 
-        RequestBody image = RequestBody.create(MediaType.parse("image/*"), this.image);
-        RequestBody name = RequestBody.create(MediaType.parse("text/plain"), productName.getText().toString());
-        RequestBody description = RequestBody.create(MediaType.parse("text/plain"), productDescription.getText().toString());
-        RequestBody price = RequestBody.create(MediaType.parse("text/plain"), productPrice.getText().toString());
+        Map<String, RequestBody> map = new HashMap<>();
 
-        Call<Product> call = service.update(this.productId, image, name, description, price);
+        map.put("name", RequestBody.create(MediaType.parse("text/plain"), productName.getText().toString()));
+        map.put("description", RequestBody.create(MediaType.parse("text/plain"), productDescription.getText().toString()));
+        map.put("price", RequestBody.create(MediaType.parse("text/plain"), productPrice.getText().toString()));
+
+        if (image != null) {
+            RequestBody imageFile = RequestBody.create(MediaType.parse("image/jpg"), image);
+            map.put("image\"; filename=\"" + image.getName(), imageFile);
+        }
+
+        Call<Product> call = service.update(this.productId, map);
 
         call.enqueue(new Callback<Product>() {@Override
         public void onResponse(Call<Product> call, Response<Product> response) {

@@ -4,7 +4,11 @@
     package="io.pacheco.orders">
     <!-- Internet Permission -->
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature android:name="android.hardware.camera" android:required="true" />
+
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="true" />
+
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application
@@ -16,7 +20,8 @@
         android:theme="@style/AppTheme"
         android:usesCleartextTraffic="true"
         tools:targetApi="m">
-        <activity android:name=".OrderItemActivity"></activity>
+        <activity android:name=".ClientItemActivity"></activity>
+        <activity android:name=".OrderItemActivity" />
         <activity
             android:name=".OrderActivity"
             android:label="@string/title_activity_order_list"

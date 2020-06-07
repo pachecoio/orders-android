@@ -1,6 +1,7 @@
 package io.pacheco.orders.ui.client.list;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,14 +10,19 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import io.pacheco.orders.ClientItemActivity;
+import io.pacheco.orders.OrderItemActivity;
 import io.pacheco.orders.R;
 import io.pacheco.orders.adapters.UserAdapter;
 import io.pacheco.orders.api.UserApi;
@@ -34,6 +40,12 @@ public class ClientListFragment extends Fragment implements UserAdapter.ListItem
     private ArrayList<User> clients = new ArrayList<>();
     ProgressDialog progressDialog;
 
+    FloatingActionButton fab;
+
+    public static final int OPEN_CLIENT_REQUEST = 0;
+
+    UserApi service = RetrofitClientInstance.getRetrofitInstance().create(UserApi.class);
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         clientListViewModel =
@@ -42,7 +54,16 @@ public class ClientListFragment extends Fragment implements UserAdapter.ListItem
 
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Loading....");
-        progressDialog.show();
+
+        fab = root.findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), ClientItemActivity.class);
+                startActivity(intent);
+            }
+        });
 
         recyclerView = root.findViewById(R.id.recycler_view);
 
@@ -58,7 +79,30 @@ public class ClientListFragment extends Fragment implements UserAdapter.ListItem
         mAdapter = new UserAdapter(clients, this);
         recyclerView.setAdapter(mAdapter);
 
-        UserApi service = RetrofitClientInstance.getRetrofitInstance().create(UserApi.class);
+        getUsers();
+
+        return root;
+    }
+
+    @Override
+    public void onListItemClick(int clickedItemIndex) {
+        Intent intent = new Intent(getActivity(), ClientItemActivity.class);
+        intent.putExtra("client", clients.get(clickedItemIndex));
+        startActivityForResult(intent, OPEN_CLIENT_REQUEST);
+    }
+
+    /*Method to generate List of data using RecyclerView with custom adapter*/
+    private void generateDataList(ArrayList<User> newUsers) {
+
+        Log.i("clients", "get clients");
+        if(newUsers != null) {
+            clients.addAll(newUsers);
+        }
+        mAdapter.notifyDataSetChanged();
+    }
+
+    public void getUsers() {
+        progressDialog.show();
         Call<List<User>> call = service.getAll("client");
 
         call.enqueue(new Callback<List<User>>() {@Override
@@ -75,30 +119,16 @@ public class ClientListFragment extends Fragment implements UserAdapter.ListItem
                 Toast.makeText(getActivity(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
-
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
-        return root;
     }
 
     @Override
-    public void onListItemClick(int clickedItemIndex) {
-//        Intent intent = new Intent(getActivity(), UserActivity.class);
-//        intent.putExtra("product", orders.get(clickedItemIndex));
-//        startActivity(intent);
-    }
-
-    /*Method to generate List of data using RecyclerView with custom adapter*/
-    private void generateDataList(ArrayList<User> newUsers) {
-
-        Log.i("clients", "get clients");
-        if(newUsers != null) {
-            clients.addAll(newUsers);
-        }
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Log.i("reset clients array", "clientes");
+        clients.removeAll(clients);
+        mAdapter.notifyDataSetChanged();
+        Log.i("get clients", "get");
+        getUsers();
         mAdapter.notifyDataSetChanged();
     }
 }
