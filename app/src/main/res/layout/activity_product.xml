@@ -37,7 +37,6 @@
                 android:id="@+id/product_name"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Product name"
                 android:paddingRight="20dp"
                 android:width="200dp"/>
 
@@ -82,18 +81,34 @@
     </LinearLayout>
 
     <LinearLayout
-        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
-
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:padding="20dp">
         <Button
             android:id="@+id/save_btn"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginRight="5dp"
+            android:background="#6E8DFF"
+            android:text="Salvar"
+            android:textColor="#FFFFFF"
             android:layout_weight="1"
-            android:layout_gravity="center"
-            android:text="Salvar"/>
+            android:enabled="false"/>
 
+        <Button
+            android:id="@+id/delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="5dp"
+            android:background="#FF3C3C"
+            android:text="Deletar"
+            android:textColor="#FFFFFF"
+            android:layout_weight="1"
+            android:visibility="gone"/>
     </LinearLayout>
 
 

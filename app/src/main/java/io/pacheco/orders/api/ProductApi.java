@@ -7,6 +7,7 @@ import io.pacheco.orders.models.Product;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import retrofit2.Call;
+import retrofit2.http.DELETE;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -20,6 +21,13 @@ public interface ProductApi {
     Call<List<Product>> getAll();
 
     @Multipart
+    @POST("product")
+    Call<Product> create(@PartMap Map<String, RequestBody> params);
+
+    @Multipart
     @PUT("product/{id}")
     Call<Product> update(@Path("id") Integer id, @PartMap Map<String, RequestBody> params);
+
+    @DELETE("product/{id}")
+    Call<String> delete(@Path("id") Integer id);
 }

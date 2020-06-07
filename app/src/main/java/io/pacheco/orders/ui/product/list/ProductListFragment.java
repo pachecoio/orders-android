@@ -10,14 +10,18 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import io.pacheco.orders.ClientItemActivity;
 import io.pacheco.orders.ProductActivity;
 import io.pacheco.orders.R;
 import io.pacheco.orders.adapters.ProductAdapter;
@@ -36,6 +40,12 @@ public class ProductListFragment extends Fragment implements ProductAdapter.List
     private ArrayList<Product> products = new ArrayList<>();
     ProgressDialog progressDialog;
 
+    FloatingActionButton fab;
+
+    public static final int OPEN_PRODUCT_REQUEST = 999;
+
+    ProductApi service = RetrofitClientInstance.getRetrofitInstance().create(ProductApi.class);
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_product_list, container, false);
@@ -43,6 +53,16 @@ public class ProductListFragment extends Fragment implements ProductAdapter.List
         progressDialog = new ProgressDialog(getActivity());
         progressDialog.setMessage("Loading....");
         progressDialog.show();
+
+        fab = root.findViewById(R.id.fab);
+
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(getActivity(), ProductActivity.class);
+                startActivity(intent);
+            }
+        });
 
         recyclerView = root.findViewById(R.id.recycler_view);
 
@@ -58,15 +78,20 @@ public class ProductListFragment extends Fragment implements ProductAdapter.List
         mAdapter = new ProductAdapter(products, this);
         recyclerView.setAdapter(mAdapter);
 
-        ProductApi service = RetrofitClientInstance.getRetrofitInstance().create(ProductApi.class);
+        getProducts();
+        return root;
+    }
+
+    private void getProducts() {
         Call<List<Product>> call = service.getAll();
 
-        call.enqueue(new Callback<List<Product>>() {@Override
-        public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
-            progressDialog.dismiss();
-            Log.i("products found", response.message());
-            generateDataList((ArrayList<Product>) response.body());
-        }
+        call.enqueue(new Callback<List<Product>>() {
+            @Override
+            public void onResponse(Call<List<Product>> call, Response<List<Product>> response) {
+                progressDialog.dismiss();
+                Log.i("products found", response.message());
+                generateDataList((ArrayList<Product>) response.body());
+            }
 
             @Override
             public void onFailure(Call<List<Product>> call, Throwable t) {
@@ -75,32 +100,35 @@ public class ProductListFragment extends Fragment implements ProductAdapter.List
                 Toast.makeText(getActivity(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
-
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
-        return root;
     }
 
     @Override
     public void onListItemClick(int clickedItemIndex) {
         Intent intent = new Intent(getActivity(), ProductActivity.class);
         intent.putExtra("product", products.get(clickedItemIndex));
-        startActivity(intent);
+        startActivityForResult(intent, OPEN_PRODUCT_REQUEST);
     }
 
     /*Method to generate List of data using RecyclerView with custom adapter*/
     private void generateDataList(ArrayList<Product> newProducts) {
 
         Log.i("products", "get products");
-        if(newProducts != null) {
+        if(newProducts != null && newProducts.size() > 0) {
             Log.i("current products", newProducts.toString());
             Log.i("first product", newProducts.get(0).getName());
             products.addAll(newProducts);
         }
         mAdapter.notifyDataSetChanged();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == OPEN_PRODUCT_REQUEST) {
+            Log.i("action", "Data updated, get products again");
+            products.removeAll(products);
+            mAdapter.notifyDataSetChanged();
+            getProducts();
+        }
     }
 }

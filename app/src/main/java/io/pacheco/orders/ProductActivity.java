@@ -39,11 +39,13 @@ import retrofit2.Response;
 
 public class ProductActivity extends AppCompatActivity {
 
+    Product product;
     ImageView productImage;
     EditText productName;
     EditText productPrice;
     EditText productDescription;
     Button saveBtn;
+    Button deleteBtn;
 
     static final int REQUEST_IMAGE_CAPTURE = 1;
     private File image;
@@ -52,16 +54,22 @@ public class ProductActivity extends AppCompatActivity {
 
     Integer productId = null;
 
+    ProductApi service = RetrofitClientInstance.getRetrofitInstance().create(ProductApi.class);
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_product);
+
+        progressDialog = new ProgressDialog(this);
+        progressDialog.setMessage("Loading....");
 
         productImage = findViewById(R.id.product_image);
         productName = findViewById(R.id.product_name);
         productPrice = findViewById(R.id.product_price);
         productDescription = findViewById(R.id.product_description);
         saveBtn = findViewById(R.id.save_btn);
+        deleteBtn = findViewById(R.id.delete_btn);
 
         productImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,6 +85,13 @@ public class ProductActivity extends AppCompatActivity {
             }
         });
 
+        deleteBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                deleteProduct();
+            }
+        });
+
         ActionBar actionBar = getSupportActionBar();
 
         if (actionBar != null) {
@@ -85,9 +100,11 @@ public class ProductActivity extends AppCompatActivity {
         }
 
         Intent intent = getIntent();
-        Product product = intent.getParcelableExtra("product");
+        product = intent.getParcelableExtra("product");
 
         if(product != null) {
+            deleteBtn.setVisibility(View.VISIBLE);
+            saveBtn.setEnabled(true);
             this.productId = product.getId();
             getSupportActionBar().setTitle(product.getName());
             Picasso.get()
@@ -129,6 +146,7 @@ public class ProductActivity extends AppCompatActivity {
 
             this.image = persistImage(imageBitmap, "product_image_" + String.valueOf(ms));
             productImage.setImageBitmap(imageBitmap);
+            saveBtn.setEnabled(true);
         }
     }
 
@@ -151,11 +169,7 @@ public class ProductActivity extends AppCompatActivity {
 
     public void saveProduct() {
 
-        progressDialog = new ProgressDialog(ProductActivity.this);
-        progressDialog.setMessage("Loading....");
         progressDialog.show();
-
-        ProductApi service = RetrofitClientInstance.getRetrofitInstance().create(ProductApi.class);
 
         Map<String, RequestBody> map = new HashMap<>();
 
@@ -168,12 +182,19 @@ public class ProductActivity extends AppCompatActivity {
             map.put("image\"; filename=\"" + image.getName(), imageFile);
         }
 
-        Call<Product> call = service.update(this.productId, map);
+        Call<Product> call;
+
+        if(product != null && product.getId() != null) {
+            call = service.update(this.productId, map);
+        } else {
+            call = service.create(map);
+        }
 
         call.enqueue(new Callback<Product>() {@Override
         public void onResponse(Call<Product> call, Response<Product> response) {
             progressDialog.dismiss();
             Log.i("Product saved", response.message());
+            finish();
         }
 
             @Override
@@ -181,6 +202,32 @@ public class ProductActivity extends AppCompatActivity {
                 progressDialog.dismiss();
                 Log.i("error", t.getMessage());
                 Toast.makeText(ProductActivity.this, "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
+                finish();
+            }
+        });
+    }
+
+    public void deleteProduct() {
+
+        Log.i("action", "delete product");
+
+        progressDialog.show();
+
+        Call<String> call = service.delete(product.getId());
+
+        call.enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                progressDialog.dismiss();
+                Log.i("Product deleted", response.message());
+                finish();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                progressDialog.dismiss();
+                Log.e("error deleting product", t.getMessage());
+                finish();
             }
         });
     }
