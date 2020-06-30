@@ -21,16 +21,23 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
 
     private final ListItemClickListener mOnClickListener;
 
+    private final ListItemLongClickListener mOnLongClickListener;
+
     public interface ListItemClickListener {
         void onListItemClick(int clickedItemIndex);
     }
 
-    public ProductAdapter(ArrayList<Product> products, ListItemClickListener listener) {
-        this.products = products;
-        mOnClickListener = listener;
+    public interface ListItemLongClickListener {
+        void onListItemLongClick(int clickedItemIndex);
     }
 
-    class ProductViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public ProductAdapter(ArrayList<Product> products, ListItemClickListener listener, ListItemLongClickListener longListener) {
+        this.products = products;
+        mOnClickListener = listener;
+        mOnLongClickListener = longListener;
+    }
+
+    class ProductViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener, View.OnLongClickListener {
         // each data item is just a string in this case
         TextView itemTitle;
         TextView itemPrice;
@@ -42,12 +49,20 @@ public class ProductAdapter extends RecyclerView.Adapter<ProductAdapter.ProductV
             itemPrice = itemView.findViewById(R.id.list_item_price);
             itemImage = itemView.findViewById(R.id.list_item_image);
             itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
         @Override
         public void onClick(View v) {
             int position = getAdapterPosition();
             mOnClickListener.onListItemClick(position);
+        }
+
+        @Override
+        public boolean onLongClick(View view) {
+            int position = getAdapterPosition();
+            mOnLongClickListener.onListItemLongClick(position);
+            return false;
         }
     }
 

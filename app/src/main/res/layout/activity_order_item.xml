@@ -16,14 +16,11 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"/>
 
-    <EditText
-        android:layout_height="wrap_content"
+    <Spinner
+        android:id="@+id/clients_spinner"
         android:layout_width="match_parent"
-        android:id="@+id/order_client_name"
-        android:text="Client name"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:layout_marginBottom="20dp"/>
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"/>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recycler_view"
@@ -33,11 +30,46 @@
         android:paddingLeft="20dp"
         android:paddingRight="20dp"/>
 
+    <Spinner
+        android:id="@+id/products_spinner"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"/>
+
     <TextView
         android:id="@+id/order_total"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Total R$ 0,00"
         android:padding="20dp"/>
+
+    <LinearLayout
+        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:orientation="horizontal"
+        android:weightSum="2"
+        android:padding="20dp">
+        <Button
+            android:id="@+id/save_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginRight="5dp"
+            android:background="#6E8DFF"
+            android:text="Salvar"
+            android:textColor="#FFFFFF"
+            android:layout_weight="1"/>
+
+        <Button
+            android:id="@+id/delete_btn"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:layout_marginLeft="5dp"
+            android:background="#FF3C3C"
+            android:text="Deletar"
+            android:textColor="#FFFFFF"
+            android:layout_weight="1"/>
+    </LinearLayout>
 
 </LinearLayout>

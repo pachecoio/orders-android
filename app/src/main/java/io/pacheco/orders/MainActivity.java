@@ -26,7 +26,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class MainActivity extends AppCompatActivity implements ProductAdapter.ListItemClickListener {
+public class MainActivity extends AppCompatActivity implements ProductAdapter.ListItemClickListener, ProductAdapter.ListItemLongClickListener {
 
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -67,7 +67,7 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.Li
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new ProductAdapter(products, this);
+        mAdapter = new ProductAdapter(products, this, this);
         recyclerView.setAdapter(mAdapter);
 
         btn.setOnClickListener(onClickListener);
@@ -125,5 +125,10 @@ public class MainActivity extends AppCompatActivity implements ProductAdapter.Li
         Intent intent = new Intent(MainActivity.this, ProductActivity.class);
         intent.putExtra("product", products.get(clickedItemIndex));
         startActivity(intent);
+    }
+
+    @Override
+    public void onListItemLongClick(int clickedItemIndex) {
+
     }
 }

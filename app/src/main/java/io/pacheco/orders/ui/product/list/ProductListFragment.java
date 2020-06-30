@@ -32,7 +32,7 @@ import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class ProductListFragment extends Fragment implements ProductAdapter.ListItemClickListener {
+public class ProductListFragment extends Fragment implements ProductAdapter.ListItemClickListener, ProductAdapter.ListItemLongClickListener {
     private ProductListViewModel productListViewModel;
     private RecyclerView recyclerView;
     private RecyclerView.Adapter mAdapter;
@@ -75,7 +75,7 @@ public class ProductListFragment extends Fragment implements ProductAdapter.List
         recyclerView.setLayoutManager(layoutManager);
 
         // specify an adapter
-        mAdapter = new ProductAdapter(products, this);
+        mAdapter = new ProductAdapter(products, this, this);
         recyclerView.setAdapter(mAdapter);
 
         getProducts();
@@ -112,6 +112,8 @@ public class ProductListFragment extends Fragment implements ProductAdapter.List
     /*Method to generate List of data using RecyclerView with custom adapter*/
     private void generateDataList(ArrayList<Product> newProducts) {
 
+        products.clear();
+
         Log.i("products", "get products");
         if(newProducts != null && newProducts.size() > 0) {
             Log.i("current products", newProducts.toString());
@@ -122,13 +124,13 @@ public class ProductListFragment extends Fragment implements ProductAdapter.List
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if(requestCode == OPEN_PRODUCT_REQUEST) {
-            Log.i("action", "Data updated, get products again");
-            products.removeAll(products);
-            mAdapter.notifyDataSetChanged();
-            getProducts();
-        }
+    public void onResume() {
+        super.onResume();
+        getProducts();
+    }
+
+    @Override
+    public void onListItemLongClick(int clickedItemIndex) {
+
     }
 }

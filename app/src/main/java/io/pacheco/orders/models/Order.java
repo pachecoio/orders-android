@@ -17,6 +17,15 @@ public class Order implements Parcelable {
     @SerializedName("client")
     private User client;
 
+    public Order() {
+
+    }
+
+    public Order(ArrayList<Product> products, User client) {
+        this.products = products;
+        this.client = client;
+    }
+
     public Order(Integer id, ArrayList<Product> products, User client) {
         this.id = id;
         this.products = products;

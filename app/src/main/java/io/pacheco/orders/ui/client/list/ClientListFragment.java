@@ -94,6 +94,8 @@ public class ClientListFragment extends Fragment implements UserAdapter.ListItem
     /*Method to generate List of data using RecyclerView with custom adapter*/
     private void generateDataList(ArrayList<User> newUsers) {
 
+        clients.clear();
+
         Log.i("clients", "get clients");
         if(newUsers != null) {
             clients.addAll(newUsers);
@@ -122,13 +124,8 @@ public class ClientListFragment extends Fragment implements UserAdapter.ListItem
     }
 
     @Override
-    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.i("reset clients array", "clientes");
-        clients.removeAll(clients);
-        mAdapter.notifyDataSetChanged();
-        Log.i("get clients", "get");
+    public void onResume() {
+        super.onResume();
         getUsers();
-        mAdapter.notifyDataSetChanged();
     }
 }

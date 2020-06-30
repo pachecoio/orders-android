@@ -40,6 +40,8 @@ public class OrderListFragment extends Fragment implements OrderAdapter.ListItem
 
     FloatingActionButton fab;
 
+    OrderApi service = RetrofitClientInstance.getRetrofitInstance().create(OrderApi.class);
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         orderListViewModel =
@@ -74,7 +76,18 @@ public class OrderListFragment extends Fragment implements OrderAdapter.ListItem
         mAdapter = new OrderAdapter(orders, this);
         recyclerView.setAdapter(mAdapter);
 
-        OrderApi service = RetrofitClientInstance.getRetrofitInstance().create(OrderApi.class);
+        getOrders();
+
+//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
+//            @Override
+//            public void onChanged(@Nullable String s) {
+//                textView.setText(s);
+//            }
+//        });
+        return root;
+    }
+
+    public void getOrders() {
         Call<List<Order>> call = service.getAll();
 
         call.enqueue(new Callback<List<Order>>() {@Override
@@ -91,14 +104,12 @@ public class OrderListFragment extends Fragment implements OrderAdapter.ListItem
                 Toast.makeText(getActivity(), "Something went wrong...Please try later!", Toast.LENGTH_SHORT).show();
             }
         });
+    }
 
-//        homeViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {
-//            @Override
-//            public void onChanged(@Nullable String s) {
-//                textView.setText(s);
-//            }
-//        });
-        return root;
+    @Override
+    public void onResume() {
+        super.onResume();
+        getOrders();
     }
 
     @Override
@@ -110,6 +121,8 @@ public class OrderListFragment extends Fragment implements OrderAdapter.ListItem
 
     /*Method to generate List of data using RecyclerView with custom adapter*/
     private void generateDataList(ArrayList<Order> newOrders) {
+
+        orders.clear();
 
         Log.i("orders", "get orders");
         if(newOrders != null) {
